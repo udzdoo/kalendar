@@ -13,8 +13,6 @@
 
       body {
         font-family: "Arial", sans-serif;
-        margin: 0;
-        padding: 0;
         background-color: #eaeaea;
         display: flex;
         justify-content: center;
@@ -44,16 +42,20 @@
       .input-wrapper {
         position: relative;
         width: 100%;
-        margin-bottom: 20px;
+        margin-bottom: 10px; /* smanjen razmak */
+        height: 60px;
       }
 
       .custom-placeholder {
         position: absolute;
-        top: 12px;
-        left: 16px;
-        color: #999;
+        top: -18px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #28a745;
         pointer-events: none;
         font-size: 1rem;
+        background: #fff;
+        padding: 0 6px;
         transition: 0.3s ease all;
       }
 
@@ -67,13 +69,6 @@
         appearance: none;
         outline: none;
         text-align: center;
-      }
-
-      input:focus + .custom-placeholder,
-      input:not(:placeholder-shown) + .custom-placeholder {
-        top: -10px;
-        font-size: 0.9rem;
-        color: #28a745;
       }
 
       input:disabled {
@@ -115,8 +110,8 @@
     <div class="container">
       <h2>Izaberite datum</h2>
       <div class="input-wrapper">
-        <input type="date" id="datum" oninput="sakrijPlaceholder()" />
         <span id="placeholderText" class="custom-placeholder">Izaberi datum</span>
+        <input type="date" id="datum" oninput="sakrijPlaceholder()" />
       </div>
       <button id="posaljiBtn" onclick="posaljiDatum()">Pošalji</button>
       <p id="status"></p>
