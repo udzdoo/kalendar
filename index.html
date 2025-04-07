@@ -2,74 +2,127 @@
 <html lang="sr">
   <head>
     <meta charset="UTF-8" />
-    <title>Izaberite Datum (Google Calendar)</title>
+    <title>Izaberite Datum</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
+      * {
+        box-sizing: border-box;
+      }
+
       body {
-        font-family: Arial, sans-serif;
-        padding: 20px;
+        font-family: "Arial", sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #eaeaea;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .container {
+        background-color: #ffffff;
+        padding: 30px 20px;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 90%;
+        max-width: 400px;
         text-align: center;
-        background-color: #f5f5f5;
       }
 
       h2 {
-        margin-bottom: 30px;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
       }
 
-      input[type="date"] {
-        padding: 12px;
-        font-size: 16px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
+      .input-wrapper {
+        position: relative;
         margin-bottom: 20px;
       }
 
-      button {
-        padding: 12px 20px;
-        margin-left: 10px;
-        background-color: #28a745;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 16px;
-        cursor: pointer;
+      .custom-placeholder {
+        position: absolute;
+        top: 12px;
+        left: 16px;
+        color: #999;
+        pointer-events: none;
+        font-size: 1rem;
       }
 
-      button:hover {
+      input[type="date"] {
+        width: 100%;
+        padding: 12px 16px;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #fdfdfd;
+        appearance: none;
+        outline: none;
+      }
+
+      input:disabled {
+        background-color: #f0f0f0;
+        color: #999;
+      }
+
+      button {
+        width: 100%;
+        padding: 14px;
+        font-size: 1rem;
+        background-color: #28a745;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover:not(:disabled) {
         background-color: #218838;
+      }
+
+      button:disabled {
+        background-color: #a5d6a7;
+        cursor: not-allowed;
       }
 
       #status {
         margin-top: 20px;
-        font-weight: bold;
+        font-weight: 500;
         color: #333;
-      }
-
-      #datumDisabled, #posaljiBtnDisabled {
-        pointer-events: none;
-        opacity: 0.6;
-      }
-
-      #datumEnabled, #posaljiBtnEnabled {
-        pointer-events: auto;
-        opacity: 1;
+        font-size: 1rem;
       }
     </style>
   </head>
 
   <body>
-    <h2>Izaberite datum</h2>
-    <input type="date" id="datum" class="datumEnabled" />
-    <button id="posaljiBtn" class="posaljiBtnEnabled" onclick="posaljiDatum()">Pošalji</button>
-    <p id="status"></p>
+    <div class="container">
+      <h2>Izaberite datum</h2>
+      <div class="input-wrapper">
+        <span id="placeholderText" class="custom-placeholder">Izaberi datum</span>
+        <input type="date" id="datum" oninput="sakrijPlaceholder()" />
+      </div>
+      <button id="posaljiBtn" onclick="posaljiDatum()">Pošalji</button>
+      <p id="status"></p>
+    </div>
 
     <script>
-      // Airtable config
       const AIRTABLE_API_URL = "https://api.airtable.com/v0/appyr1FqE99prjhPG/Table%201";
       const AIRTABLE_API_KEY = "patRW4eOvreEDNaTC.b95cb64a6b3f9e4bbd8b4b45cbc07999c2b9e8b95116d051ee3bee369c014029";
       const AIRTABLE_FIELD_NAME = "Datum";
 
       let datumPoslat = false;
+
+      function sakrijPlaceholder() {
+        const input = document.getElementById("datum");
+        const placeholder = document.getElementById("placeholderText");
+
+        if (input.value) {
+          placeholder.style.display = "none";
+        } else {
+          placeholder.style.display = "block";
+        }
+      }
 
       function posaljiDatum() {
         if (datumPoslat) {
@@ -102,7 +155,6 @@
             document.getElementById("status").textContent = "Datum uspešno sačuvan!";
             datumPoslat = true;
 
-            // Disable the input and button after the first submission
             document.getElementById("datum").disabled = true;
             document.getElementById("posaljiBtn").disabled = true;
           })
@@ -111,6 +163,8 @@
             document.getElementById("status").textContent = "Greška prilikom slanja datuma.";
           });
       }
+
+      document.addEventListener("DOMContentLoaded", sakrijPlaceholder);
     </script>
   </body>
 </html>
