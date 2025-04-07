@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="sr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Izaberite Datum (Google Calendar)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        text-align: center;
+        background-color: #f5f5f5;
+      }
+
+      h2 {
+        margin-bottom: 30px;
+      }
+
+      input[type="date"] {
+        padding: 12px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-bottom: 20px;
+      }
+
+      button {
+        padding: 12px 20px;
+        margin-left: 10px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #218838;
+      }
+
+      #status {
+        margin-top: 20px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      #datumDisabled, #posaljiBtnDisabled {
+        pointer-events: none;
+        opacity: 0.6;
+      }
+
+      #datumEnabled, #posaljiBtnEnabled {
+        pointer-events: auto;
+        opacity: 1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h2>Izaberite datum</h2>
+    <input type="date" id="datum" class="datumEnabled" />
+    <button id="posaljiBtn" class="posaljiBtnEnabled" onclick="posaljiDatum()">Pošalji</button>
+    <p id="status"></p>
+
+    <script>
+      // Airtable config
+      const AIRTABLE_API_URL = "https://api.airtable.com/v0/appyr1FqE99prjhPG/Table%201";
+      const AIRTABLE_API_KEY = "patRW4eOvreEDNaTC.b95cb64a6b3f9e4bbd8b4b45cbc07999c2b9e8b95116d051ee3bee369c014029";
+      const AIRTABLE_FIELD_NAME = "Datum";
+
+      let datumPoslat = false;
+
+      function posaljiDatum() {
+        if (datumPoslat) {
+          document.getElementById("status").textContent = "Datum je već poslat. Možete ga uneti samo jednom.";
+          return;
+        }
+
+        const datum = document.getElementById("datum").value;
+
+        if (!datum) {
+          document.getElementById("status").textContent = "Molimo vas da izaberete datum.";
+          return;
+        }
+
+        fetch(AIRTABLE_API_URL, {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + AIRTABLE_API_KEY,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fields: {
+              [AIRTABLE_FIELD_NAME]: datum,
+            },
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Datum uspešno poslat:", data);
+            document.getElementById("status").textContent = "Datum uspešno sačuvan!";
+            datumPoslat = true;
+
+            // Disable the input and button after the first submission
+            document.getElementById("datum").disabled = true;
+            document.getElementById("posaljiBtn").disabled = true;
+          })
+          .catch((error) => {
+            console.error("Greška:", error);
+            document.getElementById("status").textContent = "Greška prilikom slanja datuma.";
+          });
+      }
+    </script>
+  </body>
+</html>
