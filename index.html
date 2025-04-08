@@ -53,7 +53,7 @@
 
       .custom-placeholder {
         position: absolute;
-        top: -40px; /* Pomerio gore još 2 cm */
+        top: -40px;
         left: 50%;
         transform: translateX(-50%);
         color: #28a745;
@@ -102,11 +102,29 @@
         cursor: not-allowed;
       }
 
-      #status {
-        margin-top: 20px;
-        font-weight: 500;
-        color: #333;
+      .popup {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #28a745;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         font-size: 1rem;
+        z-index: 999;
+        opacity: 0;
+        transition: opacity 0.3s ease, top 0.3s ease;
+      }
+
+      .popup.show {
+        opacity: 1;
+        top: 40px;
+      }
+
+      .hidden {
+        display: none;
       }
     </style>
   </head>
@@ -119,8 +137,10 @@
         <input type="date" id="datum" oninput="sakrijPlaceholder()" />
       </div>
       <button id="posaljiBtn" onclick="posaljiDatum()">Pošalji</button>
-      <p id="status"></p>
     </div>
+
+    <!-- Popup element -->
+    <div id="popup" class="popup hidden">Datum uspešno sačuvan!</div>
 
     <script>
       const AIRTABLE_API_URL = "https://api.airtable.com/v0/appyr1FqE99prjhPG/Table%201";
@@ -140,16 +160,30 @@
         }
       }
 
+      function prikaziPopup(poruka) {
+        const popup = document.getElementById("popup");
+        popup.textContent = poruka;
+        popup.classList.remove("hidden");
+
+        setTimeout(() => {
+          popup.classList.add("show");
+        }, 10);
+
+        setTimeout(() => {
+          popup.classList.remove("show");
+          setTimeout(() => {
+            popup.classList.add("hidden");
+          }, 300);
+        }, 3000);
+      }
+
       function posaljiDatum() {
-        if (datumPoslat) {
-          document.getElementById("status").textContent = "Datum je već poslat. Možete ga uneti samo jednom.";
-          return;
-        }
+        if (datumPoslat) return;
 
         const datum = document.getElementById("datum").value;
 
         if (!datum) {
-          document.getElementById("status").textContent = "Molimo vas da izaberete datum.";
+          prikaziPopup("Molimo vas da izaberete datum.");
           return;
         }
 
@@ -167,16 +201,14 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log("Datum uspešno poslat:", data);
-            document.getElementById("status").textContent = "Datum uspešno sačuvan!";
+            prikaziPopup("Datum uspešno sačuvan!");
             datumPoslat = true;
-
             document.getElementById("datum").disabled = true;
             document.getElementById("posaljiBtn").disabled = true;
           })
           .catch((error) => {
             console.error("Greška:", error);
-            document.getElementById("status").textContent = "Greška prilikom slanja datuma.";
+            prikaziPopup("Greška prilikom slanja datuma.");
           });
       }
 
